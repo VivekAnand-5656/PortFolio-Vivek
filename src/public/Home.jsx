@@ -15,6 +15,7 @@ import frontend from '../assets/frontend.png'
 import fullstack from '../assets/fullstack.png'
 import backend from '../assets/backend.png'
 import laptop from '../assets/laptop.png'
+import FeedBack from './FeedBack';
 
 const Home = () => {
     const [projects, setProjects] = useState([])
@@ -1288,6 +1289,200 @@ const Home = () => {
 
                     </div>
                 </section>
+                {/* ================= FeedBacks ======================= */}
+                <section
+                    id='feedback'
+                    className='w-[95%] sm:w-[92%] max-w-6xl mx-auto rounded-3xl p-5 sm:p-8 mb-3 relative overflow-hidden border border-white/10 bg-white/[0.03] text-white'
+                >
+
+                    {/* Glow */}
+                    <div className='absolute -top-24 -right-20 w-60 h-60 bg-[#c809c8]/10 blur-[100px] rounded-full'></div>
+                    <div className='absolute -bottom-24 -left-20 w-60 h-60 bg-[#04b3a8]/10 blur-[100px] rounded-full'></div>
+
+
+                    <div className='relative'>
+
+                        {/* Heading */}
+                        <div className='mb-7'>
+                            <span className='text-xs sm:text-sm uppercase tracking-[5px] text-[#c809c8] font-semibold'>
+                                -- Client Feedback
+                            </span>
+
+                            <h2 className='text-2xl sm:text-4xl font-bold mt-2'>
+                                Tell Me What You
+                                <span className='bg-gradient-to-r from-[#c809c8] to-[#04b3a8] bg-clip-text text-transparent'>
+                                    {' '}Think
+                                </span>
+                            </h2>
+
+                            <p className='text-sm text-gray-400 mt-2 max-w-xl'>
+                                Your feedback helps me improve my work and deliver better
+                                experiences for every client.
+                            </p>
+                        </div>
+
+
+                        {/* Form */}
+                        <form className='w-full flex flex-col gap-5'>
+
+                            {/* Name + Email */}
+                            <div className='w-full flex flex-col sm:flex-row gap-4'>
+
+                                <div className='w-full sm:w-1/2'>
+                                    <label className='text-sm text-gray-300 mb-2 block'>
+                                        Your Name
+                                    </label>
+
+                                    <input
+                                        type='text'
+                                        name='name'
+                                        placeholder='Enter your name'
+                                        className='w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 outline-none text-white placeholder:text-gray-600 focus:border-[#c809c8] transition-colors duration-300'
+                                    />
+                                </div>
+
+
+                                <div className='w-full sm:w-1/2'>
+                                    <label className='text-sm text-gray-300 mb-2 block'>
+                                        Email Address
+                                    </label>
+
+                                    <input
+                                        type='email'
+                                        name='email'
+                                        placeholder='Enter your email'
+                                        className='w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 outline-none text-white placeholder:text-gray-600 focus:border-[#04b3a8] transition-colors duration-300'
+                                    />
+                                </div>
+
+                            </div>
+
+
+                            {/* Rating */}
+                            <div>
+                                <label className='text-sm text-gray-300 mb-3 block'>
+                                    How would you rate my portfolio?
+                                </label>
+
+                                <div className='flex flex-wrap gap-2'>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:bg-[#c809c8] hover:text-white hover:border-[#c809c8] transition-all duration-300'
+                                    >
+                                        ⭐ 1
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:bg-[#c809c8] hover:text-white hover:border-[#c809c8] transition-all duration-300'
+                                    >
+                                        ⭐ 2
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:bg-[#c809c8] hover:text-white hover:border-[#c809c8] transition-all duration-300'
+                                    >
+                                        ⭐ 3
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:bg-[#c809c8] hover:text-white hover:border-[#c809c8] transition-all duration-300'
+                                    >
+                                        ⭐ 4
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:bg-[#c809c8] hover:text-white hover:border-[#c809c8] transition-all duration-300'
+                                    >
+                                        ⭐ 5
+                                    </button>
+
+                                </div>
+                            </div>
+
+
+                            {/* Feedback Type */}
+                            <div>
+                                <label className='text-sm text-gray-300 mb-3 block'>
+                                    What would you like to share?
+                                </label>
+
+                                <div className='flex flex-wrap gap-2'>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:text-white hover:bg-[#04b3a8] hover:border-[#04b3a8] transition-all duration-300'
+                                    >
+                                        Portfolio
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:text-white hover:bg-[#04b3a8] hover:border-[#04b3a8] transition-all duration-300'
+                                    >
+                                        Design
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:text-white hover:bg-[#04b3a8] hover:border-[#04b3a8] transition-all duration-300'
+                                    >
+                                        Projects
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='px-4 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:text-white hover:bg-[#04b3a8] hover:border-[#04b3a8] transition-all duration-300'
+                                    >
+                                        Suggestion
+                                    </button>
+
+                                </div>
+                            </div>
+
+
+                            {/* Message */}
+                            <div>
+                                <label className='text-sm text-gray-300 mb-2 block'>
+                                    Your Feedback
+                                </label>
+
+                                <textarea
+                                    name='feedback'
+                                    rows='5'
+                                    placeholder='Write your feedback here...'
+                                    className='w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 outline-none resize-none text-white placeholder:text-gray-600 focus:border-[#c809c8] transition-colors duration-300'
+                                ></textarea>
+                            </div>
+
+
+                            {/* Submit */}
+                            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+
+                                <p className='text-xs text-gray-500'>
+                                    Your feedback is highly appreciated.
+                                </p>
+
+                                <button
+                                    type='submit'
+                                    className='w-full sm:w-auto px-7 py-3 rounded-full bg-gradient-to-r from-[#c809c8] to-[#8b2be2] text-white font-semibold text-sm shadow-[0_0_20px_rgba(200,9,200,0.2)] hover:scale-105 hover:shadow-[0_0_30px_rgba(200,9,200,0.35)] transition-all duration-300'
+                                >
+                                    Submit Feedback →
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </section>
+                {/* =========== FeedBacks ======== */}
+                <FeedBack/>
             </div >
         </>
     )
