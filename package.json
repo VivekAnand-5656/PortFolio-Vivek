@@ -24,6 +24,7 @@
     "react-redux": "^9.3.0",
     "react-router-dom": "^7.18.2",
     "react-router-hash-link": "^2.4.3",
+    "react-simple-typewriter": "^5.0.1",
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.1.0",
     "redux-persist": "^6.0.0",

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios"
+import { motion, useScroll } from 'framer-motion';
+import { Typewriter } from "react-simple-typewriter"
 
 import { GrProjects } from "react-icons/gr";
 import { IoMdCodeDownload } from "react-icons/io";
@@ -20,6 +22,7 @@ import FeedBack from './FeedBack';
 const Home = () => {
     const [projects, setProjects] = useState([])
     const [details, setDetails] = useState({})
+    const designation = ["Python Developer", "Full Stack Developer", "Backend Developer", "React Developer"]
 
     // ------------------------
     const api_base = "https://my-portfolio-32s5.onrender.com"
@@ -80,50 +83,50 @@ const Home = () => {
         fetch_details()
     }, [])
 
+    // ============================ Motion ==================
+    const { scrollYProgress } = useScroll();
+
     return (
         <>
-            <div className='w-full h-auto flex flex-col gap-3'>
+            <motion.div
+                style={{ scaleX: scrollYProgress, }}
+                className="fixed top-0 left-0 w-full h-2 bg-[#fb06ff] origin-left z-50" />
+
+            <div
+                className='w-full h-auto flex flex-col gap-3'>
 
                 {/* ======= Hero Section ======= */}
-                <section
+                <motion.section
+                    initial={{ opacity: 0, y: 100 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
                     id="home"
-                    className="w-[95vw] sm:w-[92vw] lg:w-[85vw] min-h-[75vh] lg:h-[85vh]
-  mx-auto mt-2 rounded-3xl relative overflow-hidden
-  flex justify-center items-center py-12 lg:py-0
-  border border-white/10 bg-white/[0.02]"
+                    className="w-[95vw] sm:w-[92vw] lg:w-[85vw] min-h-[75vh] lg:h-[85vh] mx-auto mt-2 rounded-3xl relative overflow-hidden flex justify-center items-center py-12 lg:py-0 border border-white/10 bg-white/[0.02]"
                 >
                     {/* Background Glow */}
-                    <div className="absolute -top-32 -left-20 w-72 h-72
-  bg-[#c809c8]/15 blur-[120px] rounded-full"></div>
+                    <div className="absolute -top-32 -left-20 w-72 h-72 bg-[#c809c8]/15 blur-[120px] rounded-full"></div>
 
-                    <div className="absolute -bottom-32 right-0 w-72 h-72
-  bg-[#04b3a8]/10 blur-[120px] rounded-full"></div>
+                    <div className="absolute -bottom-32 right-0 w-72 h-72 bg-[#04b3a8]/10 blur-[120px] rounded-full"></div>
 
-                    <div className="w-full max-w-6xl mx-auto flex flex-col-reverse
-  lg:flex-row items-center justify-between gap-10 px-5 sm:px-8 z-10">
+                    <div className="w-full max-w-6xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-10 px-5 sm:px-8 z-10">
 
                         {/* Left Side */}
                         <div
-                            className="w-full lg:w-[55%] flex flex-col gap-4
-      text-center lg:text-left items-center lg:items-start"
+                            className="w-full lg:w-[55%] flex flex-col gap-4 text-center lg:text-left items-center lg:items-start"
                         >
 
                             {/* Intro */}
                             <div className="flex items-center gap-2">
                                 <span className="w-8 h-[2px] bg-[#c809c8]"></span>
 
-                                <span className="text-[#c809c8] font-mono
-        tracking-[4px] text-xs sm:text-sm uppercase">
+                                <span className="text-[#c809c8] font-mono tracking-[4px] text-xs sm:text-sm uppercase">
                                     Hey, I'm
                                 </span>
                             </div>
 
                             {/* Name */}
                             <h1
-                                className="bg-gradient-to-r from-[#c809c8] via-purple-500 to-[#04b3a8]
-        bg-clip-text text-transparent
-        text-[2.7rem] sm:text-[3.5rem] lg:text-[4.5rem]
-        leading-[0.95] uppercase font-bold font-mono"
+                                className="bg-gradient-to-r from-[#c809c8] via-purple-500 to-[#04b3a8] bg-clip-text text-transparent text-[2.7rem] sm:text-[3.5rem] lg:text-[4.5rem] leading-[0.95] uppercase font-bold font-mono"
                             >
                                 Vivek Anand
                             </h1>
@@ -133,7 +136,18 @@ const Home = () => {
                                 className="text-white text-base sm:text-xl font-semibold
         border-l-2 border-[#04b3a8] pl-3"
                             >
-                                Full Stack Developer
+                                {/* Full Stack Developer */}
+                                <span >
+                                    <Typewriter
+                                        words={designation}
+                                        loop={0}
+                                        cursor
+                                        cursorStyle="|"
+                                        typeSpeed={80}
+                                        deleteSpeed={50}
+                                        delaySpeed={1500}
+                                    />
+                                </span>
                                 <span className="text-gray-500 mx-2">·</span>
                                 <span className="text-[#c809c8]">
                                     Python & React
@@ -284,61 +298,47 @@ const Home = () => {
 
                             {/* Neon Circle */}
                             <div
-                                className="absolute w-60 h-60 sm:w-72 sm:h-72
-        rounded-full border-4 border-[#c809c8]
-        rotate-x-70
-        shadow-[0_0_40px_0_#c809c8]
-        -bottom-10 sm:-bottom-5
-        right-[10%] sm:right-[12%]"
+                                className="absolute w-60 h-60 sm:w-72 sm:h-72 rounded-full border-4 border-[#c809c8] rotate-x-70 shadow-[0_0_40px_0_#c809c8] -bottom-10 sm:-bottom-5 right-[10%] sm:right-[12%]"
                             ></div>
 
                             {/* Laptop */}
-                            <img
+                            <motion.img
+                                whileHover={{ scale: 1.1 }}
                                 src={laptop}
                                 alt="Vivek Anand - Full Stack Developer"
-                                className="relative z-10 w-72 sm:w-96 lg:w-[430px]
-        hover:scale-105
-        transition-transform duration-500
-        drop-shadow-[0_25px_35px_rgba(0,0,0,0.5)]"
+                                className="relative z-10 w-72 sm:w-96 lg:w-[430px] drop-shadow-[0_25px_35px_rgba(0,0,0,0.5)]"
                             />
 
                         </div>
 
                     </div>
-                </section>
+                </motion.section>
                 {/* =========== Projects ======== */}
                 <section
                     id="projects"
-                    className="relative overflow-hidden w-[95%] sm:w-[92%] max-w-6xl mx-auto
-  border-t border-white/10 rounded-3xl
-  py-10 sm:py-12 px-5 sm:px-7 mb-3"
+                    className="relative overflow-hidden w-[95%] sm:w-[92%] max-w-6xl mx-auto border-t border-white/10 rounded-3xl py-10 sm:py-12 px-5 sm:px-7 mb-3"
                 >
                     {/* Background Glow */}
-                    <div className="absolute -top-24 right-10 w-60 h-60
-  bg-[#c809c8]/10 blur-[100px] rounded-full"></div>
+                    <div className="absolute -top-24 right-10 w-60 h-60 bg-[#c809c8]/10 blur-[100px] rounded-full"></div>
 
-                    <div className="absolute -bottom-24 left-10 w-60 h-60
-  bg-[#04b3a8]/10 blur-[100px] rounded-full"></div>
+                    <div className="absolute -bottom-24 left-10 w-60 h-60 bg-[#04b3a8]/10 blur-[100px] rounded-full"></div>
 
                     <div className="relative">
 
                         {/* Heading */}
                         <div className="max-w-6xl mx-auto mb-8">
 
-                            <span className="text-xs sm:text-sm uppercase
-      tracking-[5px] text-[#c809c8] font-semibold">
+                            <span className="text-xs sm:text-sm uppercase tracking-[5px] text-[#c809c8] font-semibold">
                                 -- Selected Work
                             </span>
 
-                            <div className="flex flex-col sm:flex-row
-      sm:items-end sm:justify-between gap-3 mt-2">
+                            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mt-2">
 
                                 <div>
                                     <h2 className="text-2xl sm:text-4xl font-bold text-white">
                                         Projects I've{" "}
                                         <span
-                                            className="bg-gradient-to-r from-[#c809c8] to-[#04b3a8]
-              bg-clip-text text-transparent"
+                                            className="bg-gradient-to-r from-[#c809c8] to-[#04b3a8] bg-clip-text text-transparent"
                                         >
                                             Built
                                         </span>
@@ -350,8 +350,7 @@ const Home = () => {
                                     </p>
                                 </div>
 
-                                <span className="text-xs text-gray-500
-        border border-white/10 rounded-full px-3 py-1 w-fit">
+                                <span className="text-xs text-gray-500 border border-white/10 rounded-full px-3 py-1 w-fit">
                                     {projects?.length || 0} Projects
                                 </span>
 
@@ -359,23 +358,21 @@ const Home = () => {
                         </div>
 
                         {/* Projects */}
-                        <div className="max-w-6xl mx-auto w-full flex flex-wrap
-    justify-center lg:justify-start items-start gap-6">
+                        <div className="max-w-6xl mx-auto w-full flex flex-wrap justify-center lg:justify-start items-start gap-6">
 
                             {projects?.map((project, index) => (
 
-                                <div
+                                <motion.div
+                                    initial={{ opacity: 0, y: 100 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, amount: 0.2 }}
+                                    transition={{
+                                        duration: 0.8,
+                                        ease: "easeOut"
+                                    }}
+
                                     key={index}
-                                    className="group w-full sm:w-[300px] lg:w-[31%]
-          p-3 rounded-2xl
-          bg-white/[0.04]
-          border border-white/10
-          backdrop-blur-sm
-          shadow-[0_0_20px_rgba(200,9,200,0.06)]
-          hover:border-[#c809c8]/50
-          hover:shadow-[0_0_30px_rgba(200,9,200,0.18)]
-          hover:-translate-y-2
-          transition-all duration-300"
+                                    className="group w-full sm:w-[300px] lg:w-[31%]  p-3 rounded-2xl  bg-white/[0.04] border border-white/10 backdrop-blur-sm shadow-[0_0_20px_rgba(200,9,200,0.06)] hover:border-[#c809c8]/50 hover:shadow-[0_0_30px_rgba(200,9,200,0.18)] hover:-translate-y-2 transition-all duration-300"
                                 >
 
                                     {/* Image */}
@@ -482,7 +479,7 @@ const Home = () => {
                                         </div>
 
                                     </div>
-                                </div>
+                                </motion.div>
 
                             ))}
 
@@ -792,7 +789,10 @@ const Home = () => {
                                 </p>
                             ) : (
                                 details.services?.map((service, index) => (
-                                    <div
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 50 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5 }}
                                         key={index}
                                         className="group flex-1 min-w-full sm:min-w-[220px]
             p-5 rounded-2xl
@@ -837,7 +837,7 @@ const Home = () => {
             transition-all duration-500">
                                         </div>
 
-                                    </div>
+                                    </motion.div>
                                 ))
                             )}
                         </div>
@@ -1482,10 +1482,11 @@ const Home = () => {
 
                 </section>
                 {/* =========== FeedBacks ======== */}
-                <FeedBack/>
+                <FeedBack />
             </div >
         </>
     )
+
 }
 
 export default Home
