@@ -7,31 +7,114 @@ import { useNavigate } from 'react-router-dom'
 import { IoClose } from 'react-icons/io5'
 
 const AdminHome = () => {
+
     const navigate = useNavigate()
+
     const api_base = "https://my-portfolio-32s5.onrender.com"
 
     const [projects, setProjects] = useState([])
     const [details, setDetails] = useState({})
 
+    // ================= Fetch Projects =================
+
     const fetch_projects = async () => {
         try {
-            const response = await axios.get(`${api_base}/admin/getprojects`)
+            const response = await axios.get(
+                `${api_base}/admin/getprojects`
+            )
+
             setProjects(response.data)
+
         } catch (error) {
             console.log(error)
         }
     }
 
+    // ================= Fetch Details =================
+
     const fetch_details = async () => {
         try {
-            const response = await axios.get(`${api_base}/admin/getdetails`)
+            const response = await axios.get(
+                `${api_base}/admin/getdetails`
+            )
+
             setDetails(response.data[0])
+
         } catch (error) {
             console.log(error)
         }
     }
-    // ============== Update Project ===========
+
+    // ==================================================
+    //                  UPDATE RESUME
+    // ==================================================
+
+    const [resumeFile, setResumeFile] = useState(null)
+    const [resumeLoading, setResumeLoading] = useState(false)
+
+    const update_resume = async () => {
+
+        if (!details?._id) {
+            alert("Details not found")
+            return
+        }
+
+        if (!resumeFile) {
+            alert("Please select a PDF resume")
+            return
+        }
+
+        if (resumeFile.type !== "application/pdf") {
+            alert("Only PDF files are allowed")
+            return
+        }
+
+        try {
+
+            setResumeLoading(true)
+
+            const formData = new FormData()
+
+            formData.append("file", resumeFile)
+
+            const response = await axios.patch(
+                `${api_base}/admin/uploadresume/${details._id}`,
+                formData 
+            )
+
+            console.log(response.data)
+
+            alert("Resume Updated Successfully")
+
+            setResumeFile(null)
+
+            await fetch_details()
+
+        } catch (error) {
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
+            alert(
+                error.response?.data?.detail ||
+                "Failed to update resume"
+            )
+
+        } finally {
+
+            setResumeLoading(false)
+
+        }
+    }
+
+    // ==================================================
+    //                  UPDATE PROJECT
+    // ==================================================
+
     const [showProject, setShowProject] = useState(false)
+
     const [formdata, setFormdata] = useState({
         title: "",
         details: "",
@@ -45,119 +128,222 @@ const AdminHome = () => {
     const [pId, setPId] = useState("")
 
     const handle_change = (e) => {
-        setFormdata({ ...formdata, [e.target.name]: e.target.value })
+        setFormdata({
+            ...formdata,
+            [e.target.name]: e.target.value
+        })
     }
 
     const add_tech = () => {
+
         if (techInput.trim() === "") return
-        setTechstacks([...techstacks, techInput.trim()])
+
+        setTechstacks([
+            ...techstacks,
+            techInput.trim()
+        ])
+
         setTechInput("")
     }
 
     const remove_tech = (index) => {
-        setTechstacks(techstacks.filter((_, i) => i !== index))
+
+        setTechstacks(
+            techstacks.filter((_, i) => i !== index)
+        )
     }
 
     const handle_key_down = (e) => {
+
         if (e.key === "Enter") {
+
             e.preventDefault()
+
             add_tech()
         }
     }
 
     const handle_submit = async (e) => {
+
         e.preventDefault()
+
         try {
-            const payload = { ...formdata, techstacks }
-            const response = await axios.put(`${api_base}/admin/updateproject/${pId}`, payload)
+
+            const payload = {
+                ...formdata,
+                techstacks
+            }
+
+            const response = await axios.put(
+                `${api_base}/admin/updateproject/${pId}`,
+                payload
+            )
+
             alert("Project Updated")
+
             setPId("")
+
             setShowProject(false)
+
             await fetch_projects()
-            setFormdata({ title: "", details: "", gitlink: "", livelink: "", createdAt: "" })
+
+            setFormdata({
+                title: "",
+                details: "",
+                gitlink: "",
+                livelink: "",
+                createdAt: ""
+            })
+
             setTechstacks([])
+
         } catch (error) {
+
             alert("Something went wrong")
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
         }
     }
 
-    // ============= About Update ===============
+    // ==================================================
+    //                  ABOUT UPDATE
+    // ==================================================
+
     const [showAbout, setShowAbout] = useState(false)
+
     const [aboutId, setAboutId] = useState("")
+
     const [abouttext, setAbouttext] = useState("")
 
     const update_about = async (e) => {
+
         e.preventDefault()
+
         try {
-            const response = await axios.put(`${api_base}/admin/updateabout/${aboutId}`, null,
+
+            const response = await axios.put(
+                `${api_base}/admin/updateabout/${aboutId}`,
+                null,
                 {
                     params: {
                         about: abouttext
                     }
                 }
             )
+
             alert("About Updated")
+
             await fetch_details()
+
             setShowAbout(false)
 
         } catch (error) {
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
             console.log(`Error:- ${error}`)
         }
     }
 
-    // ======== Add Skills ==========
+    // ==================================================
+    //                  ADD SKILLS
+    // ==================================================
+
     const [newskill, setNewskill] = useState("")
+
     const add_skill = async (skillid) => {
+
         try {
-            const response = await axios.put(`${api_base}/admin/updateskills/${skillid}`, null,
+
+            const response = await axios.put(
+                `${api_base}/admin/updateskills/${skillid}`,
+                null,
                 {
                     params: {
                         skill: newskill
                     }
                 }
             )
+
             alert("Skill Updated")
+
             await fetch_details()
+
             setNewskill("")
 
         } catch (error) {
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
             console.log(`Error:- ${error}`)
         }
     }
 
-    // ====== Update Service ======
+    // ==================================================
+    //                  UPDATE SERVICE
+    // ==================================================
+
     const [showService, setShowService] = useState(false)
+
     const [serviceForm, setServiceForm] = useState({
         title: "",
         description: ""
     })
 
     const service_change = (e) => {
-        setServiceForm({ ...serviceForm, [e.target.name]: e.target.value })
+
+        setServiceForm({
+            ...serviceForm,
+            [e.target.name]: e.target.value
+        })
     }
 
     const update_service = async (d_id) => {
+
         try {
-            const response = await axios.put(`${api_base}/admin/updateservice/${d_id}`, serviceForm)
+
+            const response = await axios.put(
+                `${api_base}/admin/updateservice/${d_id}`,
+                serviceForm
+            )
+
             alert("Service Updated ")
+
             await fetch_details()
+
             setServiceForm({
                 title: "",
                 description: ""
             })
+
             setShowService(false)
 
         } catch (error) {
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
             console.log(`Error:- ${error}`)
         }
     }
 
-    // ============== Update Social Links ========
+    // ==================================================
+    //                  SOCIAL LINKS
+    // ==================================================
+
     const [showlink, setShowlink] = useState(false)
+
     const [linkform, setLinkform] = useState({
         github: "",
         linkedin: "",
@@ -165,29 +351,51 @@ const AdminHome = () => {
     })
 
     const link_change = (e) => {
-        setLinkform({ ...linkform, [e.target.name]: e.target.value })
+
+        setLinkform({
+            ...linkform,
+            [e.target.name]: e.target.value
+        })
     }
+
     const update_link = async (d_id) => {
+
         try {
-            const response = await axios.put(`${api_base}/admin/updatesociallink/${d_id}`,
+
+            const response = await axios.put(
+                `${api_base}/admin/updatesociallink/${d_id}`,
                 linkform
             )
+
             await fetch_details()
+
             alert("Links Updated")
+
             setLinkform({
                 github: "",
                 linkedin: "",
                 instagram: ""
             })
+
             setShowlink(false)
+
         } catch (error) {
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
             console.log(`Error:- ${error}`)
         }
     }
 
-    // =========== Add Education ==========
+    // ==================================================
+    //                  EDUCATION
+    // ==================================================
+
     const [showedu, setShowedu] = useState(false)
+
     const [eduForm, setEduForm] = useState({
         degree: "",
         institute: "",
@@ -198,15 +406,26 @@ const AdminHome = () => {
     })
 
     const edu_change = (e) => {
-        setEduForm({ ...eduForm, [e.target.name]: e.target.value })
+
+        setEduForm({
+            ...eduForm,
+            [e.target.name]: e.target.value
+        })
     }
+
     const add_edu = async (d_id) => {
+
         try {
-            await axios.put(`${api_base}/admin/updateeducation/${d_id}`,
+
+            await axios.put(
+                `${api_base}/admin/updateeducation/${d_id}`,
                 eduForm
             )
+
             await fetch_details()
+
             alert("Education Addedd")
+
             setEduForm({
                 degree: "",
                 institute: "",
@@ -215,15 +434,26 @@ const AdminHome = () => {
                 grade: "",
                 description: ""
             })
+
             setShowedu(false)
+
         } catch (error) {
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
             console.log(`Error:- ${error}`)
         }
     }
 
-    // ======= Add Certification ==========
+    // ==================================================
+    //                  CERTIFICATION
+    // ==================================================
+
     const [showctfcn, setShowctfcn] = useState(false)
+
     const [certiForm, setCertiForm] = useState({
         title: "",
         organization: "",
@@ -231,36 +461,75 @@ const AdminHome = () => {
     })
 
     const certi_change = (e) => {
-        setCertiForm({ ...certiForm, [e.target.name]: e.target.value })
+
+        setCertiForm({
+            ...certiForm,
+            [e.target.name]: e.target.value
+        })
     }
+
     const add_certification = async (d_id) => {
+
         try {
-            await axios.put(`${api_base}/admin/updatecertification/${d_id}`, certiForm)
+
+            await axios.put(
+                `${api_base}/admin/updatecertification/${d_id}`,
+                certiForm
+            )
+
             await fetch_details()
+
             alert("Certification Added")
+
             setShowctfcn(false)
+
         } catch (error) {
-            console.log(error.response?.data?.detail || "Something went wrong")
+
+            console.log(
+                error.response?.data?.detail ||
+                "Something went wrong"
+            )
+
             console.log(`Error:- ${error}`)
         }
     }
 
-    // ---------- Delete handlers ----------
+    // ==================================================
+    //                  DELETE HANDLERS
+    // ==================================================
+
     const delete_project = async (id) => {
+
         if (!window.confirm("Delete this project?")) return
+
         try {
-            await axios.delete(`${api_base}/admin/deleteproject/${id}`)
-            setProjects(projects.filter((p) => p._id !== id))
+
+            await axios.delete(
+                `${api_base}/admin/deleteproject/${id}`
+            )
+
+            setProjects(
+                projects.filter(
+                    (p) => p._id !== id
+                )
+            )
+
             await fetch_projects()
+
         } catch (error) {
+
             alert("Something went wrong")
         }
     }
 
     const delete_skill = async (id, skil) => {
+
         if (!window.confirm("Delete this skill?")) return
+
         try {
-            await axios.delete(`${api_base}/admin/deleteskill/${id}`,
+
+            await axios.delete(
+                `${api_base}/admin/deleteskill/${id}`,
                 {
                     params: {
                         skill: skil
@@ -269,378 +538,1030 @@ const AdminHome = () => {
             )
 
             await fetch_details()
+
             alert("Skill deleted")
+
         } catch (error) {
+
             alert("Something went wrong")
         }
     }
 
     const delete_service = async (id, servicetitle) => {
+
         if (!window.confirm("Delete this service?")) return
+
         try {
-            await axios.delete(`${api_base}/admin/deleteservice/${id}`,
+
+            await axios.delete(
+                `${api_base}/admin/deleteservice/${id}`,
                 {
                     params: {
                         title: servicetitle
                     }
                 }
             )
+
             await fetch_details()
+
             alert("Service Deleted")
 
         } catch (error) {
+
             alert("Something went wrong")
         }
     }
 
     const delete_education = async (id, edudegree) => {
+
         if (!window.confirm("Delete this education entry?")) return
+
         try {
-            await axios.delete(`${api_base}/admin/deleteeducation/${id}`,
+
+            await axios.delete(
+                `${api_base}/admin/deleteeducation/${id}`,
                 {
                     params: {
                         degree: edudegree
                     }
                 }
             )
+
             await fetch_details()
+
             alert("Education Deleted")
+
         } catch (error) {
+
             alert("Something went wrong")
         }
     }
 
     const delete_certification = async (id, certtitle) => {
+
         if (!window.confirm("Delete this certificate?")) return
+
         try {
-            await axios.delete(`${api_base}/admin/deletecertofocatopn/${id}`,
+
+            await axios.delete(
+                `${api_base}/admin/deletecertofocatopn/${id}`,
                 {
                     params: {
                         title: certtitle
                     }
                 }
             )
+
             await fetch_details()
+
         } catch (error) {
+
             alert("Something went wrong")
         }
     }
 
-    const row = 'flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0'
-    const iconBtn = 'w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-300'
-    const updateBtn = 'flex items-center gap-1 bg-[#04665a] text-white text-xs px-3 py-1.5 rounded-full hover:bg-[#024d4d] transition-colors duration-300 cursor-pointer'
-    const addBtn = 'bg-[#d1ca0b] text-black text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-[#024d4d] hover:text-white transition-colors duration-300 cursor-pointer'
-    const fieldInput = 'w-full border-b-2 border-gray-300 focus:border-[#04665a] px-2 py-2 outline-none bg-transparent transition-colors duration-300'
-    const panelWrap = (show) => `overflow-hidden transition-all duration-500 ease-in-out ${show ? 'max-h-[900px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`
-    const panelInner = 'bg-gray-50 rounded-2xl p-4 flex flex-col gap-3 border border-[#024d4d]/10'
-    const closeBtn = 'self-end w-7 h-7 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 hover:text-red-600 transition-colors duration-300'
+    // ==================================================
+    //                  STYLES
+    // ==================================================
+
+    const row =
+        'flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0'
+
+    const iconBtn =
+        'w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors duration-300'
+
+    const updateBtn =
+        'flex items-center gap-1 bg-[#04665a] text-white text-xs px-3 py-1.5 rounded-full hover:bg-[#024d4d] transition-colors duration-300 cursor-pointer'
+
+    const addBtn =
+        'bg-[#d1ca0b] text-black text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-[#024d4d] hover:text-white transition-colors duration-300 cursor-pointer'
+
+    const fieldInput =
+        'w-full border-b-2 border-gray-300 focus:border-[#04665a] px-2 py-2 outline-none bg-transparent transition-colors duration-300'
+
+    const panelWrap = (show) =>
+        `overflow-hidden transition-all duration-500 ease-in-out ${
+            show
+                ? 'max-h-[900px] opacity-100 mt-3'
+                : 'max-h-0 opacity-0'
+        }`
+
+    const panelInner =
+        'bg-gray-50 rounded-2xl p-4 flex flex-col gap-3 border border-[#024d4d]/10'
+
+    const closeBtn =
+        'self-end w-7 h-7 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-200 hover:text-red-600 transition-colors duration-300'
+
+    // ==================================================
+    //                  USE EFFECT
+    // ==================================================
 
     useEffect(() => {
+
         fetch_projects()
+
         fetch_details()
+
     }, [])
 
-    return (
-        <div className='w-[95%] sm:w-[85%] max-w-4xl mx-auto my-8 flex flex-col gap-6'>
-            <button onClick={() => navigate("/adddetail")} className={addBtn}>Add Details</button>
+    // ==================================================
+    //                  RETURN
+    // ==================================================
 
-            {/* Projects */}
+    return (
+
+        <div className='w-[95%] sm:w-[85%] max-w-4xl mx-auto my-8 flex flex-col gap-6'>
+
+            <button
+                onClick={() => navigate("/adddetail")}
+                className={addBtn}
+            >
+                Add Details
+            </button>
+
+            {/* ==================================================
+                            PROJECTS
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
                 <div className='w-full flex justify-between items-center mb-2'>
-                    <h3 className='text-lg font-semibold text-[#024d4d]'>Projects</h3>
-                    <button onClick={() => navigate("/addproject")} className={addBtn}>Add</button>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        Projects
+                    </h3>
+
+                    <button
+                        onClick={() => navigate("/addproject")}
+                        className={addBtn}
+                    >
+                        Add
+                    </button>
+
                 </div>
 
                 {projects?.map((project) => (
-                    <div key={project._id} className={row}>
+
+                    <div
+                        key={project._id}
+                        className={row}
+                    >
+
                         <div>
-                            <p className='font-medium'>{project.title}</p>
+
+                            <p className='font-medium'>
+                                {project.title}
+                            </p>
+
                             <div className='flex gap-2 mt-1 flex-wrap'>
+
                                 {project.techstacks?.map((tech, i) => (
-                                    <span key={i} className='text-xs text-gray-500'>{tech}{i < project.techstacks.length - 1 ? ',' : ''}</span>
+
+                                    <span
+                                        key={i}
+                                        className='text-xs text-gray-500'
+                                    >
+                                        {tech}
+                                        {i < project.techstacks.length - 1 ? ',' : ''}
+                                    </span>
+
                                 ))}
+
                             </div>
+
                         </div>
 
                         <div className='flex items-center gap-1 shrink-0'>
-                            <a href={project.gitlink} target='_blank' rel='noopener noreferrer' className={iconBtn}><FaGithub /></a>
-                            <a href={project.livelink} target='_blank' rel='noopener noreferrer' className={iconBtn}><IoLogoVercel /></a>
-                            <button className={iconBtn} onClick={() => {
-                                setShowProject(true)
-                                setPId(project._id)
-                            }}><FiEdit2 /></button>
-                            <button onClick={() => delete_project(project._id)} className={iconBtn + ' hover:text-red-600'}><FiTrash2 /></button>
+
+                            <a
+                                href={project.gitlink}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className={iconBtn}
+                            >
+                                <FaGithub />
+                            </a>
+
+                            <a
+                                href={project.livelink}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className={iconBtn}
+                            >
+                                <IoLogoVercel />
+                            </a>
+
+                            <button
+                                className={iconBtn}
+                                onClick={() => {
+
+                                    setShowProject(true)
+
+                                    setPId(project._id)
+
+                                }}
+                            >
+                                <FiEdit2 />
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    delete_project(project._id)
+                                }
+                                className={
+                                    iconBtn +
+                                    ' hover:text-red-600'
+                                }
+                            >
+                                <FiTrash2 />
+                            </button>
+
                         </div>
+
                     </div>
+
                 ))}
+
             </div>
 
-            {/* About */}
+            {/* ==================================================
+                            ABOUT
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
                 <div className='flex justify-between items-center'>
-                    <h3 className='text-lg font-semibold text-[#024d4d]'>About</h3>
-                    <button onClick={() => {
-                        setShowAbout(!showAbout)
-                        setAboutId(details._id)
-                    }} className={updateBtn}>Update <FiEdit2 /></button>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        About
+                    </h3>
+
+                    <button
+                        onClick={() => {
+
+                            setShowAbout(!showAbout)
+
+                            setAboutId(details._id)
+
+                        }}
+                        className={updateBtn}
+                    >
+                        Update <FiEdit2 />
+                    </button>
+
                 </div>
-                <p className='text-sm text-gray-600 mt-2'>{details.about}</p>
+
+                <p className='text-sm text-gray-600 mt-2'>
+                    {details.about}
+                </p>
 
                 <div className={panelWrap(showAbout)}>
+
                     <div className={panelInner}>
-                        <button className={closeBtn} onClick={() => setShowAbout(false)}><FiX /></button>
+
+                        <button
+                            className={closeBtn}
+                            onClick={() => setShowAbout(false)}
+                        >
+                            <FiX />
+                        </button>
+
                         <textarea
-                            name="about" placeholder='Write about yourself........'
-                            className={fieldInput + ' resize-none'}
+                            name="about"
+                            placeholder='Write about yourself........'
+                            className={
+                                fieldInput +
+                                ' resize-none'
+                            }
                             rows={3}
                             value={abouttext}
-                            onChange={(e) => setAbouttext(e.target.value)}
-                        ></textarea>
-                        <button className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
+                            onChange={(e) =>
+                                setAbouttext(e.target.value)
+                            }
+                        />
+
+                        <button
+                            className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
                             onClick={update_about}
-                        >Update</button>
+                        >
+                            Update
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
 
-            {/* Skills */}
+            {/* ==================================================
+                            SKILLS
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
                 <div className='flex justify-between items-center mb-2'>
-                    <h3 className='text-lg font-semibold text-[#024d4d]'>Skills</h3>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        Skills
+                    </h3>
+
                 </div>
 
-                {/* ===== Add Skill ===== */}
                 <div className='flex items-center mb-3 gap-2'>
-                    <input type="text" placeholder='Add skills...' className={fieldInput}
+
+                    <input
+                        type="text"
+                        placeholder='Add skills...'
+                        className={fieldInput}
                         value={newskill}
-                        onChange={(e) => setNewskill(e.target.value)}
+                        onChange={(e) =>
+                            setNewskill(e.target.value)
+                        }
                     />
-                    <button className='shrink-0 bg-[#04665a] rounded-full cursor-pointer text-white px-4 py-2 text-sm font-semibold hover:bg-[#024d4d] transition-colors duration-300'
-                        onClick={() => add_skill(details._id)}
-                    >Add</button>
+
+                    <button
+                        className='shrink-0 bg-[#04665a] rounded-full cursor-pointer text-white px-4 py-2 text-sm font-semibold hover:bg-[#024d4d] transition-colors duration-300'
+                        onClick={() =>
+                            add_skill(details._id)
+                        }
+                    >
+                        Add
+                    </button>
+
                 </div>
 
                 <div className='flex flex-wrap gap-2'>
+
                     {details.skills?.map((skill, i) => (
-                        <span key={i} className='flex items-center gap-1 text-xs bg-gray-100 px-3 py-1.5 rounded-full'>
+
+                        <span
+                            key={i}
+                            className='flex items-center gap-1 text-xs bg-gray-100 px-3 py-1.5 rounded-full'
+                        >
+
                             {skill}
-                            <FiTrash2 className='cursor-pointer hover:text-red-600 transition-colors duration-300' onClick={() => delete_skill(details._id, skill)} />
+
+                            <FiTrash2
+                                className='cursor-pointer hover:text-red-600 transition-colors duration-300'
+                                onClick={() =>
+                                    delete_skill(
+                                        details._id,
+                                        skill
+                                    )
+                                }
+                            />
+
                         </span>
+
                     ))}
+
                 </div>
+
             </div>
 
-            {/* Services */}
+            {/* ==================================================
+                            SERVICES
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
-                <h3 className='text-lg font-semibold text-[#024d4d] mb-2'>Services</h3>
+
+                <h3 className='text-lg font-semibold text-[#024d4d] mb-2'>
+                    Services
+                </h3>
+
                 {details.services?.map((service, index) => (
-                    <div key={index} className={row}>
+
+                    <div
+                        key={index}
+                        className={row}
+                    >
+
                         <div>
-                            <p className='font-medium'>{service.title}</p>
-                            <p className='text-xs text-gray-500'>{service.description}</p>
+
+                            <p className='font-medium'>
+                                {service.title}
+                            </p>
+
+                            <p className='text-xs text-gray-500'>
+                                {service.description}
+                            </p>
+
                         </div>
+
                         <div className='flex items-center gap-1 shrink-0'>
-                            <button className={iconBtn}
-                                onClick={() => setShowService(!showService)} ><FiEdit2 /></button>
-                            <button onClick={() => delete_service(details._id, service.title)} className={iconBtn + ' hover:text-red-600'}><FiTrash2 /></button>
+
+                            <button
+                                className={iconBtn}
+                                onClick={() =>
+                                    setShowService(!showService)
+                                }
+                            >
+                                <FiEdit2 />
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    delete_service(
+                                        details._id,
+                                        service.title
+                                    )
+                                }
+                                className={
+                                    iconBtn +
+                                    ' hover:text-red-600'
+                                }
+                            >
+                                <FiTrash2 />
+                            </button>
+
                         </div>
+
                     </div>
+
                 ))}
 
-                {/* ========= Update Service ====== */}
                 <div className={panelWrap(showService)}>
+
                     <div className={panelInner}>
-                        <button className={closeBtn} onClick={() => setShowService(false)}><FiX /></button>
-                        <input type="text" className={fieldInput} placeholder='Full Stack Developer' required
+
+                        <button
+                            className={closeBtn}
+                            onClick={() =>
+                                setShowService(false)
+                            }
+                        >
+                            <FiX />
+                        </button>
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Full Stack Developer'
+                            required
                             name='title'
                             value={serviceForm.title}
                             onChange={service_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Details............' required
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Details............'
+                            required
                             name='description'
                             value={serviceForm.description}
                             onChange={service_change}
                         />
-                        <button className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
-                            onClick={() => update_service(details._id)}
-                        >Update</button>
+
+                        <button
+                            className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
+                            onClick={() =>
+                                update_service(details._id)
+                            }
+                        >
+                            Update
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
 
-            {/* Social Links */}
+            {/* ==================================================
+                            SOCIAL LINKS
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
                 <div className='flex justify-between items-center'>
-                    <h3 className='text-lg font-semibold text-[#024d4d]'>Social Links</h3>
-                    <button onClick={() => setShowlink(!showlink)} className={updateBtn}>Update <FiEdit2 /></button>
-                </div>
-                <div className='flex flex-col gap-1 mt-2 text-sm text-gray-600'>
-                    <p>GitHub: {details.socialLinks?.github}</p>
-                    <p>LinkedIn: {details.socialLinks?.linkedin}</p>
-                    <p>Instagram: {details.socialLinks?.instagram}</p>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        Social Links
+                    </h3>
+
+                    <button
+                        onClick={() =>
+                            setShowlink(!showlink)
+                        }
+                        className={updateBtn}
+                    >
+                        Update <FiEdit2 />
+                    </button>
+
                 </div>
 
-                {/* ====== Update Social Links ===== */}
+                <div className='flex flex-col gap-1 mt-2 text-sm text-gray-600'>
+
+                    <p>
+                        GitHub: {details.socialLinks?.github}
+                    </p>
+
+                    <p>
+                        LinkedIn: {details.socialLinks?.linkedin}
+                    </p>
+
+                    <p>
+                        Instagram: {details.socialLinks?.instagram}
+                    </p>
+
+                </div>
+
                 <div className={panelWrap(showlink)}>
+
                     <div className={panelInner}>
-                        <button className={closeBtn} onClick={() => setShowlink(false)}><FiX /></button>
-                        <input type="text" className={fieldInput} placeholder='Github'
+
+                        <button
+                            className={closeBtn}
+                            onClick={() =>
+                                setShowlink(false)
+                            }
+                        >
+                            <FiX />
+                        </button>
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Github'
                             name="github"
                             value={linkform.github}
                             onChange={link_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Linkedin'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Linkedin'
                             name='linkedin'
                             value={linkform.linkedin}
                             onChange={link_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Instagram'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Instagram'
                             name='instagram'
                             value={linkform.instagram}
                             onChange={link_change}
                         />
-                        <button className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
-                            onClick={() => update_link(details._id)}
-                        >Update</button>
+
+                        <button
+                            className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
+                            onClick={() =>
+                                update_link(details._id)
+                            }
+                        >
+                            Update
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
 
-            {/* Education */}
+            {/* ==================================================
+                            EDUCATION
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
                 <div className='w-full flex justify-between items-center mb-2'>
-                    <h3 className='text-lg font-semibold text-[#024d4d]'>Education</h3>
-                    <button className={addBtn} onClick={() => setShowedu(!showedu)}>Add</button>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        Education
+                    </h3>
+
+                    <button
+                        className={addBtn}
+                        onClick={() =>
+                            setShowedu(!showedu)
+                        }
+                    >
+                        Add
+                    </button>
+
                 </div>
+
                 {details.education?.map((item, index) => (
-                    <div key={index} className={row}>
+
+                    <div
+                        key={index}
+                        className={row}
+                    >
+
                         <div>
-                            <p className='font-medium'>{item.degree}</p>
-                            <p className='text-xs text-gray-500'>{item.institute} · {item.start_year} - {item.end_year}</p>
+
+                            <p className='font-medium'>
+                                {item.degree}
+                            </p>
+
+                            <p className='text-xs text-gray-500'>
+                                {item.institute} · {item.start_year} - {item.end_year}
+                            </p>
+
                         </div>
+
                         <div className='flex items-center gap-1 shrink-0'>
-                            <button onClick={() => delete_education(details._id, item.degree)} className={iconBtn + ' hover:text-red-600'}><FiTrash2 /></button>
+
+                            <button
+                                onClick={() =>
+                                    delete_education(
+                                        details._id,
+                                        item.degree
+                                    )
+                                }
+                                className={
+                                    iconBtn +
+                                    ' hover:text-red-600'
+                                }
+                            >
+                                <FiTrash2 />
+                            </button>
+
                         </div>
+
                     </div>
+
                 ))}
 
                 <div className={panelWrap(showedu)}>
+
                     <div className={panelInner}>
-                        <button className={closeBtn} onClick={() => setShowedu(false)}><FiX /></button>
-                        <input type="text" className={fieldInput} placeholder='Degree (B.A, BCA, B.Tech, etc)'
+
+                        <button
+                            className={closeBtn}
+                            onClick={() =>
+                                setShowedu(false)
+                            }
+                        >
+                            <FiX />
+                        </button>
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Degree (B.A, BCA, B.Tech, etc)'
                             name="degree"
                             value={eduForm.degree}
                             onChange={edu_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Institute'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Institute'
                             name='institute'
                             value={eduForm.institute}
                             onChange={edu_change}
                         />
+
                         <div className='flex gap-3'>
-                            <input type="text" className={fieldInput} placeholder='Start Year'
+
+                            <input
+                                type="text"
+                                className={fieldInput}
+                                placeholder='Start Year'
                                 name='start_year'
                                 value={eduForm.start_year}
                                 onChange={edu_change}
                             />
-                            <input type="text" className={fieldInput} placeholder='End Year'
+
+                            <input
+                                type="text"
+                                className={fieldInput}
+                                placeholder='End Year'
                                 name="end_year"
                                 value={eduForm.end_year}
                                 onChange={edu_change}
                             />
+
                         </div>
-                        <input type="text" className={fieldInput} placeholder='Grade'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Grade'
                             name='grade'
                             value={eduForm.grade}
                             onChange={edu_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Details....'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Details....'
                             name='description'
                             value={eduForm.description}
                             onChange={edu_change}
                         />
-                        <button className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
-                            onClick={() => add_edu(details._id)}
-                        >Update</button>
+
+                        <button
+                            className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
+                            onClick={() =>
+                                add_edu(details._id)
+                            }
+                        >
+                            Update
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
 
-            {/* Certification */}
+            {/* ==================================================
+                            CERTIFICATION
+            ================================================== */}
+
             <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
                 <div className='w-full flex justify-between items-center mb-2'>
-                    <h3 className='text-lg font-semibold text-[#024d4d]'>Certification</h3>
-                    <button className={addBtn} onClick={() => setShowctfcn(!showctfcn)}>Add</button>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        Certification
+                    </h3>
+
+                    <button
+                        className={addBtn}
+                        onClick={() =>
+                            setShowctfcn(!showctfcn)
+                        }
+                    >
+                        Add
+                    </button>
+
                 </div>
+
                 {details.certification?.map((cert, index) => (
-                    <div key={index} className={row}>
+
+                    <div
+                        key={index}
+                        className={row}
+                    >
+
                         <div>
-                            <p className='font-medium'>{cert.title}</p>
-                            <p className='text-xs text-gray-500'>{cert.organization}</p>
+
+                            <p className='font-medium'>
+                                {cert.title}
+                            </p>
+
+                            <p className='text-xs text-gray-500'>
+                                {cert.organization}
+                            </p>
+
                         </div>
+
                         <div className='flex items-center gap-1 shrink-0'>
-                            <button onClick={() => delete_certification(details._id, cert.title)} className={iconBtn + ' hover:text-red-600'}><FiTrash2 /></button>
+
+                            <button
+                                onClick={() =>
+                                    delete_certification(
+                                        details._id,
+                                        cert.title
+                                    )
+                                }
+                                className={
+                                    iconBtn +
+                                    ' hover:text-red-600'
+                                }
+                            >
+                                <FiTrash2 />
+                            </button>
+
                         </div>
+
                     </div>
+
                 ))}
 
-                {/* ======= Add Certification ===== */}
                 <div className={panelWrap(showctfcn)}>
+
                     <div className={panelInner}>
-                        <button className={closeBtn} onClick={() => setShowctfcn(false)}><FiX /></button>
-                        <input type="text" className={fieldInput} placeholder='Python Development, Full Stack Development'
+
+                        <button
+                            className={closeBtn}
+                            onClick={() =>
+                                setShowctfcn(false)
+                            }
+                        >
+                            <FiX />
+                        </button>
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Python Development, Full Stack Development'
                             name="title"
                             value={certiForm.title}
                             onChange={certi_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Organization'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Organization'
                             name='organization'
                             value={certiForm.organization}
                             onChange={certi_change}
                         />
-                        <input type="text" className={fieldInput} placeholder='Issue Date - 2026'
+
+                        <input
+                            type="text"
+                            className={fieldInput}
+                            placeholder='Issue Date - 2026'
                             name='issue_date'
                             value={certiForm.issue_date}
                             onChange={certi_change}
                         />
-                        <button className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
-                            onClick={() => add_certification(details._id)}
-                        >Update</button>
+
+                        <button
+                            className='self-start bg-[#04665a] text-white px-5 py-2 rounded-full font-semibold hover:bg-[#024d4d] transition-colors duration-300'
+                            onClick={() =>
+                                add_certification(
+                                    details._id
+                                )
+                            }
+                        >
+                            Update
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
 
-            {/* ================ Update Project Modal =============== */}
-            <div className={`fixed inset-0 z-50 flex items-center justify-center px-4 transition-all duration-500 ease-in-out ${showProject ? 'bg-black/50 opacity-100 pointer-events-auto' : 'bg-black/0 opacity-0 pointer-events-none'}`}>
-                <div className={`w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 transition-all duration-500 ease-in-out ${showProject ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}>
-                    <button className={closeBtn} onClick={() => setShowProject(false)}><FiX /></button>
+            {/* ==================================================
+                            UPDATE RESUME
+            ================================================== */}
 
-                    <form onSubmit={handle_submit} className='flex flex-col gap-3'>
-                        <h3 className='text-xl sm:text-2xl font-bold text-[#024d4d] mb-1'>Update Project</h3>
+            <div className='bg-white rounded-2xl p-5 border border-gray-200'>
+
+                <div className='w-full flex justify-between items-center mb-4'>
+
+                    <h3 className='text-lg font-semibold text-[#024d4d]'>
+                        Update Resume
+                    </h3>
+
+                    <button
+                        onClick={update_resume}
+                        disabled={
+                            !resumeFile ||
+                            resumeLoading
+                        }
+                        className={`${addBtn} ${
+                            !resumeFile ||
+                            resumeLoading
+                                ? 'opacity-50 cursor-not-allowed'
+                                : ''
+                        }`}
+                    >
+                        {resumeLoading
+                            ? "Updating..."
+                            : "Update"}
+                    </button>
+
+                </div>
+
+                <div className='flex flex-col gap-3'>
+
+                    <input
+                        type='file'
+                        accept='.pdf,application/pdf'
+                        onChange={(e) => {
+
+                            const selectedFile =
+                                e.target.files?.[0]
+
+                            setResumeFile(
+                                selectedFile || null
+                            )
+
+                        }}
+                        className='w-full text-sm text-gray-600
+                        file:mr-4
+                        file:py-2
+                        file:px-4
+                        file:rounded-full
+                        file:border-0
+                        file:bg-[#04665a]
+                        file:text-white
+                        file:font-semibold
+                        file:cursor-pointer
+                        hover:file:bg-[#024d4d]'
+                    />
+
+                    {resumeFile && (
+
+                        <p className='text-sm text-gray-500'>
+
+                            Selected:
+
+                            <span className='font-medium text-[#024d4d] ml-1'>
+                                {resumeFile.name}
+                            </span>
+
+                        </p>
+
+                    )}
+
+                    {details.resume && (
+
+                        <a
+                            href={details.resume}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-sm text-[#04665a] font-semibold hover:underline w-fit'
+                        >
+                            View Current CV →
+                        </a>
+
+                    )}
+
+                </div>
+
+            </div>
+
+            {/* ==================================================
+                            UPDATE PROJECT MODAL
+            ================================================== */}
+
+            <div
+                className={`fixed inset-0 z-50 flex items-center justify-center px-4 transition-all duration-500 ease-in-out ${
+                    showProject
+                        ? 'bg-black/50 opacity-100 pointer-events-auto'
+                        : 'bg-black/0 opacity-0 pointer-events-none'
+                }`}
+            >
+
+                <div
+                    className={`w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 transition-all duration-500 ease-in-out ${
+                        showProject
+                            ? 'scale-100 opacity-100'
+                            : 'scale-95 opacity-0'
+                    }`}
+                >
+
+                    <button
+                        className={closeBtn}
+                        onClick={() =>
+                            setShowProject(false)
+                        }
+                    >
+                        <FiX />
+                    </button>
+
+                    <form
+                        onSubmit={handle_submit}
+                        className='flex flex-col gap-3'
+                    >
+
+                        <h3 className='text-xl sm:text-2xl font-bold text-[#024d4d] mb-1'>
+                            Update Project
+                        </h3>
 
                         <input
-                            type='text' name='title' value={formdata.title} onChange={handle_change}
+                            type='text'
+                            name='title'
+                            value={formdata.title}
+                            onChange={handle_change}
                             placeholder='Project Title'
                             className={fieldInput}
                         />
 
                         <textarea
-                            name='details' value={formdata.details} onChange={handle_change}
+                            name='details'
+                            value={formdata.details}
+                            onChange={handle_change}
                             placeholder='Project Details'
                             rows={3}
-                            className={fieldInput + ' resize-none'}
+                            className={
+                                fieldInput +
+                                ' resize-none'
+                            }
                         />
 
                         <div className='flex flex-col gap-2'>
+
                             <div className='flex items-center gap-2 border-b-2 border-gray-300 focus-within:border-[#04665a] transition-colors duration-300'>
+
                                 <input
                                     type='text'
                                     value={techInput}
-                                    onChange={(e) => setTechInput(e.target.value)}
+                                    onChange={(e) =>
+                                        setTechInput(
+                                            e.target.value
+                                        )
+                                    }
                                     onKeyDown={handle_key_down}
                                     placeholder='Type a tech and press Enter'
                                     className='flex-1 px-2 py-2 outline-none bg-transparent'
                                 />
+
                                 <button
                                     type='button'
                                     onClick={add_tech}
@@ -648,56 +1569,92 @@ const AdminHome = () => {
                                 >
                                     Add
                                 </button>
+
                             </div>
 
                             {techstacks.length > 0 && (
+
                                 <div className='flex flex-wrap gap-2'>
-                                    {techstacks.map((tech, index) => (
-                                        <span
-                                            key={index}
-                                            className='flex items-center gap-1 bg-[#d1ca0b] text-black text-[0.75rem] px-2 py-1 rounded-full'
-                                        >
-                                            {tech}
-                                            <IoClose
-                                                onClick={() => remove_tech(index)}
-                                                className='cursor-pointer hover:text-[#024d4d] transition-colors duration-300'
-                                            />
-                                        </span>
-                                    ))}
+
+                                    {techstacks.map(
+                                        (tech, index) => (
+
+                                            <span
+                                                key={index}
+                                                className='flex items-center gap-1 bg-[#d1ca0b] text-black text-[0.75rem] px-2 py-1 rounded-full'
+                                            >
+
+                                                {tech}
+
+                                                <IoClose
+                                                    onClick={() =>
+                                                        remove_tech(
+                                                            index
+                                                        )
+                                                    }
+                                                    className='cursor-pointer hover:text-[#024d4d] transition-colors duration-300'
+                                                />
+
+                                            </span>
+
+                                        )
+                                    )}
+
                                 </div>
+
                             )}
+
                         </div>
 
                         <div className='flex items-center gap-2 border-b-2 border-gray-300 focus-within:border-[#04665a] transition-colors duration-300'>
+
                             <FaGithub className='text-gray-500' />
+
                             <input
-                                type='text' name='gitlink' value={formdata.gitlink} onChange={handle_change}
+                                type='text'
+                                name='gitlink'
+                                value={formdata.gitlink}
+                                onChange={handle_change}
                                 placeholder='GitHub Link'
                                 className='flex-1 px-2 py-2 outline-none bg-transparent'
                             />
+
                         </div>
 
                         <div className='flex items-center gap-2 border-b-2 border-gray-300 focus-within:border-[#04665a] transition-colors duration-300'>
+
                             <IoLogoVercel className='text-gray-500' />
+
                             <input
-                                type='text' name='livelink' value={formdata.livelink} onChange={handle_change}
+                                type='text'
+                                name='livelink'
+                                value={formdata.livelink}
+                                onChange={handle_change}
                                 placeholder='Live Demo Link'
                                 className='flex-1 px-2 py-2 outline-none bg-transparent'
                             />
+
                         </div>
 
                         <input
-                            type='date' name='createdAt' value={formdata.createdAt} onChange={handle_change}
+                            type='date'
+                            name='createdAt'
+                            value={formdata.createdAt}
+                            onChange={handle_change}
                             className={fieldInput}
                         />
 
                         <button
                             type='submit'
-                            className='self-start bg-[#04665a] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#024d4d] hover:pr-8 transition-all duration-300'>
+                            className='self-start bg-[#04665a] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#024d4d] hover:pr-8 transition-all duration-300'
+                        >
                             Save Project
                         </button>
+
                     </form>
+
                 </div>
+
             </div>
 
         </div>

@@ -196,7 +196,8 @@ const Home = () => {
                             >
 
                                 <a
-                                    href="#contact"
+                                    href={details.resume}
+                                    target='blank'
                                     className="flex items-center gap-2
           bg-gradient-to-r from-[#c809c8] to-[#8b2be2]
           text-white font-semibold text-sm
@@ -206,7 +207,7 @@ const Home = () => {
           hover:shadow-[0_0_35px_rgba(200,9,200,0.4)]
           transition-all duration-300"
                                 >
-                                    Let's Work Together →
+                                    View Resume →
                                 </a>
 
                                 <a
@@ -387,7 +388,7 @@ const Home = () => {
                                                 className="w-full h-44 object-cover
                 group-hover:scale-105
                 transition-transform duration-500"
-                                                src={projectimg}
+                                                src={project.file}
                                                 alt={project.title}
                                             />
 
